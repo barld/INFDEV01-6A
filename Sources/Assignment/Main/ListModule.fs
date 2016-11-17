@@ -17,3 +17,6 @@
         | [] -> failwith "empty list"
         | h::t -> fold f h t
 
+    let toSeq l =
+        seq{for item in l -> item }
+        
