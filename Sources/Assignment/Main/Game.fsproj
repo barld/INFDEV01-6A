@@ -59,6 +59,9 @@
     <Compile Include="Tile.fs" />
     <Compile Include="MapGenerator.fs" />
     <Compile Include="Game.fs" />
+    <Compile Include="ListModule.fs" />
+    <Compile Include="Sort.fs" />
+    <Compile Include="Vector2Module.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

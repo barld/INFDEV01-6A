@@ -49,7 +49,7 @@
     let random = System.Random()
     let mutable planes = [] : List<Vector2>
 
-    let mutable camera_x, camera_y, zoom = 0.0f,0.0f,10.0f
+    let mutable camera_x, camera_y, zoom = 0.0f,0.0f, 1.2f
     let clamp (a:float32) b c = MathHelper.Clamp(a,b,c)
 
     let map = MapGenerator.generate_map map_width map_height
@@ -307,6 +307,7 @@
       do sb.End()
 
       base.Draw(gt)
+
 
   let RunAssignment1 implementation fullscreen = new Simulation(Choice1Of4 implementation, fullscreen)
   let RunAssignment2 implementation fullscreen = new Simulation(Choice2Of4 implementation, fullscreen)
