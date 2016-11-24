@@ -4,7 +4,8 @@ module Sort
 
     
 
-    let mergeBy (by: 'a -> 'b when 'b : comparison) (col: seq<'a>) =
+    let mergeBy (by: 'a -> 'b when 'b : comparison) (level:int) (col: seq<'a>) =
+                
         let rec _merge (l1: 'a list) (l2: 'a list) =
             match l1, l2 with
             | [], [] -> []
@@ -16,24 +17,32 @@ module Sort
                 else
                     h2 :: _merge l1 t2
 
-        let rec __merge (list: 'a list list) =
-            match list with
-            | [] -> []
-            | [l] -> [l]
-            | h1::h2::t ->  (_merge h1 h2) :: __merge t
+        let rec _branche (level:int) (l: 'a list) : 'a list =
+            let length = l |> ListModule.length
+            let left = ListModule.take (length/2) l
+            let right = ListModule.skip (length - length/2) l
+            match (left |> ListModule.length) , (right |> ListModule.length) with
+            | 1, 1 -> _merge left right
+            | 1, _ -> _merge left (_branche (level-1) right)
+            | _, 1 -> _merge (_branche (level-1) left) right
+            | _, _ -> 
+                if level = 1 then
+                    let a = Async.StartChild (async{ return (_branche (level-1) left)})
+                    let b = Async.StartChild (async{ return (_branche (level-1) right)})
+                    let ra = Async.RunSynchronously a |> Async.RunSynchronously
+                    let rb = Async.RunSynchronously b |> Async.RunSynchronously
+                    _merge ra rb
+                else
+                    _merge (_branche (level-1) left) (_branche (level-1) right)
 
-        let rec _mergeAll (list: 'a list list) : 'a list =
-            match list with
-            | [] -> []
-            | [l] -> l
-            | l -> _mergeAll (__merge l)
 
 
-        let branches = col |> ListModule.fromSeq |> ListModule.map (fun item -> [item]) 
-        branches |> _mergeAll |> ListModule.toSeq
+        let branches = col |> ListModule.fromSeq    
+        branches |> (_branche level) |> ListModule.toSeq
 
     //for C#
     let MergeBy (by: System.Func<'a, 'b>) col =
         let by = fun x -> by.Invoke(x)
-        mergeBy by col
+        mergeBy by 1 col
+
 
