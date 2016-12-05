@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Game", "Main\Game.fsproj", "{74D933DB-A600-4636-AEF5-5FB5B37832A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntryPoint", "EntryPoint\EntryPoint.csproj", "{8FB4DEF4-B952-495D-A589-27CDA2A952D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainApplication", "TrainApplication\TrainApplication.csproj", "{DACB8A1F-A7F1-423D-B70A-E753689349DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,14 @@ Global
 		{8FB4DEF4-B952-495D-A589-27CDA2A952D6}.Release|Any CPU.ActiveCfg = Release|x86
 		{8FB4DEF4-B952-495D-A589-27CDA2A952D6}.Release|x86.ActiveCfg = Release|x86
 		{8FB4DEF4-B952-495D-A589-27CDA2A952D6}.Release|x86.Build.0 = Release|x86
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{DACB8A1F-A7F1-423D-B70A-E753689349DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

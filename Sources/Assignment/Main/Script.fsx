@@ -77,3 +77,23 @@ let nestedWorkflow  = async{
 
 // run the whole workflow
 Async.RunSynchronously nestedWorkflow  
+
+
+open System
+
+let rnd = new Random()
+
+let insertionSort (ar:int[]) =
+    let lngth = ar.Length
+    for i in 1..(lngth-1) do
+        let tmp = ar.[i]
+        let mutable j = i-1
+        while j >= 0 && ar.[j] > tmp do
+            ar.[j+1] <- ar.[j]
+            j <- j-1
+        ar.[j+1] <- tmp
+    ()
+
+let rl = [for i in 0..10 -> rnd.Next()] |> List.toArray
+rl |> insertionSort
+printfn "%A" rl
