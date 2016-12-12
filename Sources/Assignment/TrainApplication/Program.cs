@@ -144,6 +144,74 @@ namespace TrainApplication
                 return Left != null && Left.Exist(value);
 
             }
+
+            internal Node Delete(int value)
+            {
+                if(Value == value)
+                {
+                    if (Left == null) return Right;
+                    else if (Right == null) return Left;
+                    else
+                    {
+                        if(CountLeft > CountRight)
+                        {
+                            var right = Right.PickAndDeleteFirst();
+                            Value = right.Item1;
+                            Right = right.Item2;
+                            CountRight--;
+                        }
+                        else
+                        {
+                            var left = Left.PickAndDeleteLast();
+                            Value = left.Item1;
+                            Left = left.Item2;
+                            CountLeft--;
+                        }
+                    }
+                }
+                //should togle shift for balancing
+                #region shifting
+                else if (value < Value)
+                {
+                    if (Right != null && CountRight > CountLeft)
+                    {
+                        var right = Right.PickAndDeleteFirst();
+                        var currentValue = Value;
+                        Value = right.Item1;
+                        Right = right.Item2;
+                        CountRight--;
+                        Left = Left.add(currentValue);
+                        Left = Left.Delete(value);
+                    }
+                    else
+                    {
+                        CountLeft--;
+                        Left = Left.Delete(value);
+                    }
+                    
+                }
+                else
+                {
+                    if(Left!=null && CountLeft > CountRight)
+                    {
+                        var left = Left.PickAndDeleteLast();
+                        var currentValue = Value;
+                        Value = left.Item1;
+                        Left = left.Item2;
+                        CountLeft--;
+                        Right = Right.add(currentValue);
+                        Right = Right.Delete(value);
+                    }
+                    else
+                    {
+                        CountRight--;
+                        Right = Right.Delete(value);
+                    }
+                    
+                }
+                #endregion
+                return this;
+            }
         }
 
         private Node root;
@@ -228,6 +296,17 @@ namespace TrainApplication
             //otherwise just ignore for now
         }
 
+        public bool Exist(int value) => root.Exist(value);
+
+        public void Delete(int value)
+        {
+            if (root.Exist(value))
+            {
+                root = root.Delete(value);
+            }
+            //otherwise just ignore for now
+        }
+
     }
 
 
@@ -243,14 +322,26 @@ namespace TrainApplication
             {
                 //t.Add(i);
                 t.Add(rnd.Next(50));
-                t.Print();
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine();
-            }
                 
+            }
+            t.Print();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            for (int i = 63; i > 1; i--)
+            {
+                //t.Add(i);
+                t.Delete(rnd.Next(50));
 
-            
+            }
+            t.Print();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+
+
+
+
             Console.Read();
         }
     }
