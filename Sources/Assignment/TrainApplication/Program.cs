@@ -8,88 +8,18 @@ using TrainApplication;
 
 namespace TrainApplication
 {
-    //public class BinaryTree<T>
-    //{
-    //    private int cLeft = 0;
-    //    private int cRight = 0;
 
-    //    public int Count => cLeft + cRight;
-
-    //    public T Value { get; set; }
-    //    public BinaryTree<T> Left { get; set; }
-    //    public BinaryTree<T> Right { get; set; }
-
-    //    public void Add(T item)
-    //    {
-    //        if(cLeft < cRight)
-    //        {
-    //            if (Left == null)
-    //                Left = new BinaryTree<T> { Value = item };
-    //            else
-    //                Left.Add(item);
-    //            cLeft++;
-    //        }
-    //        else
-    //        {
-    //            if (Right == null)
-    //                Right = new BinaryTree<T> { Value = item };
-    //            else
-    //                Right.Add(item);
-    //            cRight++;
-    //        }
-    //    }
-
-    //    public void Print()
-    //    {
-    //        print(0);
-    //    }
-
-    //    private void print(int level)
-    //    {            
-    //        Left?.print(level + 1);
-    //        Console.WriteLine($"{new String('\t', level)}{Value}");
-    //        Right?.print(level + 1);
-    //    }
-
-    //    public BinaryTree<T> keepWhen(Predicate<T> p)
-    //    {
-    //        if (p(Value))
-    //        {
-    //            Left?.keepWhen(p);
-    //            Right?.keepWhen(p);
-    //            return this;
-    //        }
-    //        else
-    //        {
-    //            if (Left == null && Right == null)
-    //                return null;
-    //            else if (Left == null)
-    //                return Right;
-    //            else if(Right == null)
-    //                return Left;
-    //            else
-    //            {
-    //                MergeTrees(Left, Right);
-    //            }
-    //        }
-                
-    //    }
-
-    //    public static BinaryTree<T> MergeTrees(BinaryTree<T> left, BinaryTree<T> right)
-    //    {
-    //        if (left == null) throw new ArgumentNullException(nameof(left));
-    //        if (right == null) throw new ArgumentNullException(nameof(right));
-
-    //        var baseTree = left.Count > right.Count ? left : right;
-    //    }
-    //}
-
-
-    public class BalancedBinaryTree
+    public class BalancedBinaryTree<T, U> where T : IComparable
     {
+        struct KeyValue
+        {
+            public T Key { get; set; }
+            public U Value { get; set; }
+        }
+
         class Node
         {
-            internal int Value { get; set; }
+            internal KeyValue KeyValue { get; set; }
 
             internal int CountLeft { get; set; } = 0;
             internal int CountRight { get; set; } = 0;
@@ -99,55 +29,55 @@ namespace TrainApplication
             internal void print(int v)
             {
                 Left?.print(v + 1);
-                Console.WriteLine(new String('\t', v)+Value);
+                Console.WriteLine($"{new String('\t', v)} {KeyValue.Key}: {KeyValue.Value}");
                 Right?.print(v + 1);
             }
 
-            internal Node add(int value)
+            internal Node add(T key, U value)
             {
-                return Add(this, value);
+                return Add(this, key, value);
             }
 
-            internal Tuple<int, Node> PickAndDeleteLast()
+            internal Tuple<KeyValue, Node> PickAndDeleteLast()
             {
                 if (Right == null)
-                    return new Tuple<int, Node>(Value, Left);
+                    return new Tuple<KeyValue, Node>(KeyValue, Left);
                 else
                 {
                     var tup = this.Right.PickAndDeleteLast();
                     this.Right = tup.Item2;
                     this.CountRight--;
-                    return new Tuple<int, Node>(tup.Item1, this);
+                    return new Tuple<KeyValue, Node>(tup.Item1, this);
                 }
             }
 
-            internal Tuple<int, Node> PickAndDeleteFirst()
+            internal Tuple<KeyValue, Node> PickAndDeleteFirst()
             {
                 if(Left==null)
-                    return new Tuple<int, Node>(Value, Right);
+                    return new Tuple<KeyValue, Node>(KeyValue, Right);
                 else
                 {
                     var tup = this.Left.PickAndDeleteFirst();
                     this.Left = tup.Item2;
                     this.CountLeft--;
-                    return new Tuple<int, Node>(tup.Item1, this);
+                    return new Tuple<KeyValue, Node>(tup.Item1, this);
                 }
             }
 
-            internal bool Exist(int value)
+            internal bool Exist(T key)
             {
 
-                if (Value == value)
+                if (KeyValue.Key.CompareTo(key) == 0)
                     return true;
-                else if (Value < value && Right != null)
-                    return Right.Exist(value);
-                return Left != null && Left.Exist(value);
+                else if (KeyValue.Key.CompareTo(key) < 0 && Right != null)
+                    return Right.Exist(key);
+                return Left != null && Left.Exist(key);
 
             }
 
-            internal Node Delete(int value)
+            internal Node Delete(T key)
             {
-                if(Value == value)
+                if(KeyValue.Key.CompareTo(key) == 0)
                 {
                     if (Left == null) return Right;
                     else if (Right == null) return Left;
@@ -156,14 +86,14 @@ namespace TrainApplication
                         if(CountLeft > CountRight)
                         {
                             var right = Right.PickAndDeleteFirst();
-                            Value = right.Item1;
+                            KeyValue = right.Item1;
                             Right = right.Item2;
                             CountRight--;
                         }
                         else
                         {
                             var left = Left.PickAndDeleteLast();
-                            Value = left.Item1;
+                            KeyValue = left.Item1;
                             Left = left.Item2;
                             CountLeft--;
                         }
@@ -171,22 +101,22 @@ namespace TrainApplication
                 }
                 //should togle shift for balancing
                 #region shifting
-                else if (value < Value)
+                else if (KeyValue.Key.CompareTo(key) > 0)
                 {
                     if (Right != null && CountRight > CountLeft)
                     {
                         var right = Right.PickAndDeleteFirst();
-                        var currentValue = Value;
-                        Value = right.Item1;
+                        var currentValue = KeyValue;
+                        KeyValue = right.Item1;
                         Right = right.Item2;
                         CountRight--;
-                        Left = Left.add(currentValue);
-                        Left = Left.Delete(value);
+                        Left = Left.add(currentValue.Key, currentValue.Value);
+                        Left = Left.Delete(key);
                     }
                     else
                     {
                         CountLeft--;
-                        Left = Left.Delete(value);
+                        Left = Left.Delete(key);
                     }
                     
                 }
@@ -195,17 +125,17 @@ namespace TrainApplication
                     if(Left!=null && CountLeft > CountRight)
                     {
                         var left = Left.PickAndDeleteLast();
-                        var currentValue = Value;
-                        Value = left.Item1;
+                        var currentValue = KeyValue;
+                        KeyValue = left.Item1;
                         Left = left.Item2;
                         CountLeft--;
-                        Right = Right.add(currentValue);
-                        Right = Right.Delete(value);
+                        Right = Right.add(currentValue.Key, currentValue.Value);
+                        Right = Right.Delete(key);
                     }
                     else
                     {
                         CountRight--;
-                        Right = Right.Delete(value);
+                        Right = Right.Delete(key);
                     }
                     
                 }
@@ -216,9 +146,9 @@ namespace TrainApplication
 
         private Node root;
 
-        public BalancedBinaryTree(int rootValue)
+        public BalancedBinaryTree(T key, U value)
         {
-            root = new Node { Value = rootValue };
+            root = new Node { KeyValue = new KeyValue { Key = key, Value = value } };
         }
 
         public void Print()
@@ -226,83 +156,83 @@ namespace TrainApplication
             root.print(0);
         }
 
-        private static Node Add(Node r, int value)
+        private static Node Add(Node r, T key, U value)
         {
-            if(r.Value > value)
+            if(r.KeyValue.Key.CompareTo(key) > 0)
             {
                 if (r.CountRight < r.CountLeft)
                 {
-                    Tuple<int, Node> rTup = r.Left.PickAndDeleteLast();
+                    Tuple<KeyValue, Node> rTup = r.Left.PickAndDeleteLast();
                     r.Left = rTup.Item2;
                     r.CountLeft--;
-                    var currentValue = r.Value;
-                    if(value < rTup.Item1)
+                    var currentValue = r.KeyValue;
+                    if(key.CompareTo(rTup.Item1.Key) < 0)
                     {
-                        r.Value = rTup.Item1;
-                        r = Add(r, currentValue);
-                        return Add(r, value);
+                        r.KeyValue = rTup.Item1;
+                        r = Add(r, currentValue.Key, currentValue.Value);
+                        return Add(r, key, value);
                     }
                     else
                     {
-                        r.Value = value;
-                        r = Add(r, currentValue);
-                        return Add(r, rTup.Item1);
+                        r.KeyValue = new KeyValue { Key = key, Value = value };
+                        r = Add(r, currentValue.Key, currentValue.Value);
+                        return Add(r, rTup.Item1.Key, rTup.Item1.Value);
                     }
                     
                 }
 
                 if (r.Left == null)
-                    r.Left = new Node { Value = value };
+                    r.Left = new Node { KeyValue = new KeyValue { Key = key, Value = value } };
                 else
-                    r.Left = r.Left.add(value);
+                    r.Left = r.Left.add(key, value);
                 r.CountLeft++;
             }
             else
             {
                 if(r.CountRight > r.CountLeft)
                 {
-                    Tuple<int, Node> lTup = r.Right.PickAndDeleteFirst();
+                    Tuple<KeyValue, Node> lTup = r.Right.PickAndDeleteFirst();
                     r.Right = lTup.Item2;
                     r.CountRight--;
-                    var currentValue = r.Value;
-                    if(value > lTup.Item1)
+                    var currentValue = r.KeyValue;
+                    if(key.CompareTo(lTup.Item1.Key) > 0)
                     {
-                        r.Value = lTup.Item1;
-                        r = Add(r, currentValue);
-                        return Add(r, value);
+                        r.KeyValue = lTup.Item1;
+                        r = Add(r, currentValue.Key, currentValue.Value);
+                        return Add(r, key, value);
                     }
                     else
                     {
-                        r.Value = value;
-                        r = Add(r, currentValue);
-                        return Add(r, lTup.Item1);
+                        r.KeyValue = new KeyValue { Key = key, Value = value };
+                        r = Add(r, currentValue.Key, currentValue.Value);
+                        return Add(r, lTup.Item1.Key, lTup.Item1.Value);
                     }
                     
                 }
 
                 if (r.Right == null)
-                    r.Right = new Node { Value = value };
+                    r.Right = new Node { KeyValue = new KeyValue { Key = key, Value = value } };
                 else
-                    r.Right = r.Right.add(value);
+                    r.Right = r.Right.add(key, value);
                 r.CountRight++;
             }
             return r;
         }
 
-        public void Add(int value)
+        public void Add(T key, U value)
         {
-            if(!root.Exist(value))
-                root = root.add(value);
+            if(!root.Exist(key))
+                root = root.add(key, value);
             //otherwise just ignore for now
         }
 
-        public bool Exist(int value) => root.Exist(value);
+        public bool Exist(T key) => root.Exist(key);
 
-        public void Delete(int value)
+        public void Delete(T key)
         {
-            if (root.Exist(value))
+            if (root.Exist(key))
             {
-                root = root.Delete(value);
+                root = root.Delete(key);
             }
             //otherwise just ignore for now
         }
@@ -317,27 +247,27 @@ namespace TrainApplication
         {
             var rnd = new Random();
 
-            var t = new BalancedBinaryTree(0);
-            for (int i = 63; i > 1; i--)
+            var t = new BalancedBinaryTree<int,string>(0, "name");
+            for (int i = 200; i > 1; i--)
             {
                 //t.Add(i);
-                t.Add(rnd.Next(50));
+                t.Add(rnd.Next(10000), RandomNameGenerator.NameGenerator.GenerateFirstName(RandomNameGenerator.Gender.Male));
                 
             }
             t.Print();
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
-            for (int i = 63; i > 1; i--)
-            {
-                //t.Add(i);
-                t.Delete(rnd.Next(50));
+            //for (int i = 63; i > 1; i--)
+            //{
+            //    //t.Add(i);
+            //    t.Delete(rnd.Next(50));
 
-            }
-            t.Print();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
+            //}
+            //t.Print();
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //Console.WriteLine();
 
 
 
