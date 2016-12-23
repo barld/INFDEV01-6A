@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="2DTree.cs" />
     <Compile Include="BalancedBinaryTree.cs" />
     <Compile Include="Dictionary.cs" />
     <Compile Include="ILinkedList.cs" />
