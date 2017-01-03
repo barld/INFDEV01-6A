@@ -112,20 +112,62 @@ namespace EntryPoint
 
         private static IEnumerable<IEnumerable<Tuple<Vector2, Vector2>>> FindRoutesToAll(Vector2 startingBuilding, IEnumerable<Vector2> destinationBuildings, IEnumerable<Tuple<Vector2, Vector2>> roads)
         {
-            List<List<Tuple<Vector2, Vector2>>> result = new List<List<Tuple<Vector2, Vector2>>>();
-            foreach (var d in destinationBuildings)
+            var vertexes = roads.Select(t => t.Item1).Distinct().ToList();
+            var count = vertexes.Count();
+            float[,] matrixDist = new float[count,count];
+            Nullable<Vector2>[,] next = new Nullable<Vector2>[count, count];
+            for (int i=0;i<count; i++)
             {
-                var startingRoad = roads.Where(x => x.Item1.Equals(startingBuilding)).First();
-                List<Tuple<Vector2, Vector2>> fakeBestPath = new List<Tuple<Vector2, Vector2>>() { startingRoad };
-                var prevRoad = startingRoad;
-                for (int i = 0; i < 30; i++)
+                for(int j=0;j<count;j++)
                 {
-                    prevRoad = (roads.Where(x => x.Item1.Equals(prevRoad.Item2)).OrderBy(x => Vector2.Distance(x.Item2, d)).First());
-                    fakeBestPath.Add(prevRoad);
+                    matrixDist[i, j] = (i == j)? 0.0f :float.PositiveInfinity;
                 }
-                result.Add(fakeBestPath);
             }
-            return result;
+            foreach(var road in roads)
+            {
+                var startVectorIndex = vertexes.IndexOf(road.Item1);
+                var destVectorIndex = vertexes.IndexOf(road.Item2);
+                matrixDist[startVectorIndex, destVectorIndex] = Vector2.Distance(road.Item1, road.Item2);
+
+                next[startVectorIndex, destVectorIndex] = road.Item2;
+            }
+
+            for(int k=0;k<count;k++)
+            {
+                for(int i = 0; i < count; i++)
+                {
+                    for(int j = 0; j < count; j++)
+                    {
+                        if (matrixDist[i, j] > matrixDist[i, k] + matrixDist[k, j])
+                        {
+                            matrixDist[i, j] = matrixDist[i, k] + matrixDist[k, j];
+                            next[i, j] = next[i, k];
+                        }                            
+                    }
+                }
+            }
+
+            IEnumerable<Tuple<Vector2, Vector2>> getShortestRoute(Vector2 dest)
+            {                
+                var destIndex = vertexes.IndexOf(dest);
+                List<Tuple<Vector2, Vector2>> result = new List<Tuple<Vector2, Vector2>>();
+                void _getShortestRoute(Vector2 start)
+                {
+                    var startIndex = vertexes.IndexOf(start);
+                    var tempPos = next[startIndex, destIndex] ?? Vector2.Zero;//could be null but is never null
+                    result.Add(new Tuple<Vector2, Vector2>(start, tempPos));
+
+                    if(tempPos != dest)
+                        _getShortestRoute(tempPos);
+                }
+                _getShortestRoute(startingBuilding);
+                return result;
+            }
+
+            foreach (var dest in destinationBuildings)
+            {
+                yield return getShortestRoute(dest);
+            }
         }
     }
 #endif
